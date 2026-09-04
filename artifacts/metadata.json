@@ -1,0 +1,56 @@
+{
+    "timestamp": "2026-09-04T10:31:35.318820",
+    "model_architecture": {
+        "type": "HousingMLP",
+        "input_dim": 8,
+        "layers": [
+            {
+                "type": "Linear",
+                "in_features": 8,
+                "out_features": 32
+            },
+            {
+                "type": "ReLU"
+            },
+            {
+                "type": "Linear",
+                "in_features": 32,
+                "out_features": 32
+            },
+            {
+                "type": "ReLU"
+            },
+            {
+                "type": "Linear",
+                "in_features": 32,
+                "out_features": 1
+            }
+        ]
+    },
+    "preprocessing": {
+        "imputer_strategy": "median",
+        "scaler_x": "StandardScaler",
+        "scaler_y": "StandardScaler"
+    },
+    "hyperparameters": {
+        "batch_size": 64,
+        "learning_rate": 0.01,
+        "optimizer": "Adam",
+        "loss_function": "RMSELoss",
+        "patience": 10,
+        "max_epochs": 2000,
+        "stopped_epoch": 40
+    },
+    "metrics": {
+        "best_val_loss": 0.45261192321777344,
+        "final_r2_score": 0.7806553840637207,
+        "final_mape_percent": 22.131602466106415
+    },
+    "artifacts_directory": "artifacts",
+    "artifacts": {
+        "model": "housing_model.pt",
+        "imputer": "imputer.joblib",
+        "scaler_x": "scaler_x.joblib",
+        "scaler_y": "scaler_y.joblib"
+    }
+}
