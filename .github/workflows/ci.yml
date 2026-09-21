@@ -1,8 +1,16 @@
-name: CI
+name: CI/CD
 
 on:
   push:
   pull_request:
+
+env:
+  AWS_REGION: sa-east-1
+  ECR_REPOSITORY: ml-inference-service
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   test:
@@ -25,3 +33,34 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t ml-inference-service .
+
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.3.0
+        with:
+          role-to-assume: arn:aws:iam::926804199391:role/GitHubActionsMLInferenceService
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build Docker image
+        run: docker build -t ml-inference-service .
+
+      - name: Tag Docker image
+        run: |
+          docker tag ml-inference-service:latest \
+            926804199391.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${GITHUB_SHA}
+
+      - name: Push Docker image
+        run: |
+          docker push \
+            926804199391.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${GITHUB_SHA}
